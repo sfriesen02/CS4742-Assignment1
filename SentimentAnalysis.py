@@ -7,19 +7,22 @@ if __name__ == '__main__':
     train = pd.read_csv("https://raw.githubusercontent.com/MuhammedBuyukkinaci/TensorFlow-Sentiment-Analysis-on-Amazon-Reviews-Data/refs/heads/master/dataset/train_amazon.csv")
     test = pd.read_csv("https://raw.githubusercontent.com/MuhammedBuyukkinaci/TensorFlow-Sentiment-Analysis-on-Amazon-Reviews-Data/refs/heads/master/dataset/test_amazon.csv")
 
+    # Change training set size to measure impact on accuracy
+    sample_train = train.sample(n=80000)
+
     from sklearn.feature_extraction.text import CountVectorizer
 
     # CountVectorizer() converts text to a matrix of token counts
     vectorizer = CountVectorizer()
 
     # Fit CountVectorizer() onto training data and transform into a matrix of token counts
-    x_train = vectorizer.fit_transform(train['text'])
+    x_train = vectorizer.fit_transform(sample_train['text'])
 
     # Transform test data into matrix of tokens
     x_test = vectorizer.transform(test['text'])
 
     # Extracts the labels (0 for negative and 1 for positive) from the data sets
-    y_train = train['label']
+    y_train = sample_train['label']
     y_test = test['label']
 
     # Imports necessary classes for logistic regression
