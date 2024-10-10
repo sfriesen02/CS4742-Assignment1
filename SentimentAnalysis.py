@@ -1,5 +1,5 @@
-import numpy as np
 import pandas as pd
+import time
 
 if __name__ == '__main__':
 
@@ -24,27 +24,60 @@ if __name__ == '__main__':
 
     # Imports necessary classes for logistic regression
     from sklearn.linear_model import LogisticRegression
-    from sklearn.multiclass import OneVsRestClassifier
     from sklearn.metrics import confusion_matrix, classification_report
 
-    # Instantiate the classifier
-    clf = OneVsRestClassifier(LogisticRegression())
+    # Different activation functions are used for comparison
+    sigmoid_model = LogisticRegression()
+    softmax_model = LogisticRegression(multi_class='multinomial', solver='lbfgs')
 
-    # Fit the classifier to the training data
     # Trains the model to understand the relationship between input features and labels
-    clf.fit(x_train, y_train)
+    # Time() is used to measure how long the model trains for
+    start_time = time.time()
+    sigmoid_model.fit(x_train, y_train)
+    sig_train_time = time.time() - start_time
 
-    # Print the accuracy of classifier on test data set
-    # Compares predicted labels with actual labels
-    print("Accuracy: {}".format(clf.score(x_test, y_test)))
+    start_time = time.time()
+    softmax_model.fit(x_train, y_train)
+    soft_train_time = time.time() - start_time
+
+    print(f"Sigmoid training time: {sig_train_time} seconds")
+    print(f"Softmax training time: {soft_train_time} seconds")
+    print()
 
     # Uses trained classifiers to predict the labels of test set
-    x_test_clv_pred = clf.predict(x_test)
+    # Time() is used to measure how long the model makes predictions
+    start_time = time.time()
+    x_test_sig_pred = sigmoid_model.predict(x_test)
+    sig_inf_time = time.time() - start_time
+
+    start_time = time.time()
+    x_test_soft_pred = softmax_model.predict(x_test)
+    soft_inf_time = time.time() - start_time
+
+    print(f"Sigmoid Inference Time: {sig_inf_time} seconds")
+    print(f"Softmax Inference Time: {soft_inf_time} seconds")
+    print()
+
+    # Compares predicted labels with actual labels
+    print("Accuracy (Sigmoid): {}".format(sigmoid_model.score(x_test, y_test)))
+    print("Accuracy (Softmax): {}".format(softmax_model.score(x_test,y_test)))
+    print()
 
     # Prints detailed classification report
-    print(classification_report(y_test, x_test_clv_pred, target_names=['negative', 'positive']))
+    print("Sigmoid Classification Report")
+    print(classification_report(y_test, x_test_sig_pred, target_names=['negative', 'positive']))
+    print("Softmax Classification Report")
+    print(classification_report(y_test, x_test_soft_pred, target_names=['negative', 'positive']))
 
     # Create and print confusion matrix
-    cm = confusion_matrix(y_test, x_test_clv_pred)
-    print(f"Confusion Matrix:\n{cm}")
+    cm1 = confusion_matrix(y_test, x_test_sig_pred)
+    cm2 = confusion_matrix(y_test, x_test_soft_pred)
+    print(f"Confusion Matrix (Sigmoid):\n{cm1}")
+    print(f"Confusion Matrix (Softmax):\n{cm2}")
+    print()
+
+    sig_efficiency = sig_train_time + sig_inf_time
+    print("Efficiency (Sigmoid):", sig_efficiency, " seconds")
+    soft_efficiency = soft_train_time + soft_inf_time
+    print("Efficiency (Softmax):", soft_efficiency, " seconds")
 
